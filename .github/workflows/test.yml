@@ -1,5 +1,4 @@
-name: learn-github-actions
-run-name: ${{ github.actor }} is learning GitHub Actions
+name: test
 on: [push]
 jobs:
   test:
@@ -11,3 +10,7 @@ jobs:
           node-version: '18'
       - run: npm ci
       - run: npm run test -- --coverage
+      - uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: coverage/
