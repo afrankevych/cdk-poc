@@ -1,15 +1,15 @@
 import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import { aws_s3 as S3 } from 'aws-cdk-lib';
+import {Construct} from 'constructs';
+import * as lambda from 'aws-cdk-lib/aws-lambda'
 
 export class CdkPocStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
-    
-    new S3.Bucket(this, 'CDKPOCBucket', {
-      versioned: true,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      autoDeleteObjects: true,
-    })
-  }
+    constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+        super(scope, id, props);
+
+        new lambda.Function(this, 'mock-handler', {
+            runtime: lambda.Runtime.NODEJS_18_X,
+            code: lambda.Code.fromAsset('dist/lambda'),
+            handler: 'mock-handler.handler'
+        });
+    }
 }
