@@ -7,10 +7,10 @@ export class CdkPocStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const mockHandler = new lambda.Function(this, 'mock-handler', {
+        const mockHandler = new lambda.Function(this, 'mockHandler', {
             runtime: lambda.Runtime.NODEJS_18_X,
-            code: lambda.Code.fromAsset('dist/lambda'),
-            handler: 'mock-handler.handler'
+            code: lambda.Code.fromAsset('dist'),
+            handler: 'index.mockHandler'
         });
 
         new apigw.LambdaRestApi(this, 'mock-gateway', {
