@@ -1,6 +1,6 @@
-# Welcome to your CDK TypeScript project
+# CDK POC
 
-This is a blank project for CDK development with TypeScript.
+[![test](https://github.com/afrankevych/cdk-poc/actions/workflows/test.yml/badge.svg)](https://github.com/afrankevych/cdk-poc/actions/workflows/test.yml)
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
@@ -8,6 +8,6 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 * `npm run build`   compile typescript to js in dist folder
 * `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+* `npm run cdk deploy`      deploy this stack to your default AWS account/region
+* `npm run cdk diff`        compare deployed stack with current state
+* `npm run cdk synth`       emits the synthesized CloudFormation template
