@@ -1,4 +1,5 @@
 module.exports = {
+  preset: 'ts-jest',
   testEnvironment: 'node',
   roots: [
       '<rootDir>/lib',
@@ -7,13 +8,14 @@ module.exports = {
       '<rootDir>/test'
   ],
   testMatch: ['**/*.test.ts'],
-  transform: {
-    '^.+\\.tsx?$': 'ts-jest'
+  moduleNameMapper: {
+      '^@mediaExtractor/(.*)$': '<rootDir>/src/mediaExtractor/$1',
+      '^@utils/(.*)$': '<rootDir>/src/utils/$1',
   },
   collectCoverageFrom: [
-    '**/*.{ts,jx}',
-    '!dist/*',
-    '!node_modules/*',
+      '**/*.{ts,js}',
+      '!dist/*',
+      '!node_modules/*',
   ],
   coverageReporters: ['text', 'lcov'],
 };

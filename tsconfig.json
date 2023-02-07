@@ -1,5 +1,11 @@
 {
   "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": "." ,
+    "paths": {
+      "@utils/*": ["src/utils/*"],
+      "@mediaExtractor/*": ["src/mediaExtractor/*"]
+    },
     "target": "ES2020",
     "module": "commonjs",
     "lib": [

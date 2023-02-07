@@ -1,1 +1,1 @@
-export * from './mock-handler'
+export * from './extractPokemonMediaHandler'
