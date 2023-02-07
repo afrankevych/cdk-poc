@@ -3,16 +3,10 @@ import {extractPokemonMedia} from "@mediaExtractor/index";
 import * as process from "process";
 
 export const extractPokemonMediaHandler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+    // TODO log incoming event
+    // console.log("EVENT: ", JSON.stringify(event));
 
-    if (!event.queryStringParameters || !event.queryStringParameters.input) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({
-                title: 'Bad Request',
-                detail: 'Input not provided',
-            })
-        }
-    }
+    // TODO log setup error
     const bucket = process.env.S3_BUCKET;
     const bucketDomain = process.env.S3_BUCKET_DOMAIN;
     if (!bucket || !bucketDomain) {
@@ -25,8 +19,21 @@ export const extractPokemonMediaHandler = async (event: APIGatewayEvent): Promis
         }
     }
 
+    // TODO log validation error
+    if (!event.queryStringParameters || !event.queryStringParameters.input) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({
+                title: 'Bad Request',
+                detail: 'Input not provided',
+            })
+        }
+    }
+
     try {
         const media = await extractPokemonMedia({type: 'pokemon', name: event.queryStringParameters.input}, bucket);
+        // TODO log out-coming event
+        // TODO return proper event
         return {
             statusCode: 200,
             body: JSON.stringify({
@@ -34,6 +41,7 @@ export const extractPokemonMediaHandler = async (event: APIGatewayEvent): Promis
             })
         }
     } catch (err) {
+        // TODO log execution error
         return {
             statusCode: 500,
             body: JSON.stringify({
