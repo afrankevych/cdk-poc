@@ -24,10 +24,24 @@ export class CdkPocStack extends cdk.Stack {
             }
         });
 
+        const extractDigimonMediaHandler = new lambda.Function(this, 'extractDigimonMediaHandler', {
+            runtime: lambda.Runtime.NODEJS_16_X,
+            code: lambda.Code.fromAsset('dist'),
+            handler: 'index.extractDigimonMediaHandler',
+            environment: {
+                S3_BUCKET: bucket.bucketName,
+                S3_BUCKET_DOMAIN: bucket.bucketDomainName,
+            }
+        });
+
         new apigw.LambdaRestApi(this, 'extractPokemonMediaGateway', {
             handler: extractPokemonMediaHandler
         });
+        new apigw.LambdaRestApi(this, 'extractDigimonMediaGateway', {
+            handler: extractDigimonMediaHandler
+        });
 
         bucket.grantPut(extractPokemonMediaHandler);
+        bucket.grantPut(extractDigimonMediaHandler);
     }
 }

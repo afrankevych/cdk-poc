@@ -55,11 +55,11 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 - [x] Add Pokemon media extractor
     - [x] Add Pokemon API integration
     - [x] Add S3 integration
-- [ ] Add Digimon media extractor
-  - [ ] Add Digimon API integration
-  - [ ] Add S3 integration
+- [x] Add Digimon media extractor
+  - [x] Add Digimon API integration
+  - [x] Add S3 integration
 - [x] Add lambda handler for pokemon media extraction
-- [ ] Add lambda handler for pokemon media extraction
+- [x] Add lambda handler for pokemon media extraction
 - [ ] Add step function
   - [ ] Lambda choice step
   - [ ] Media extraction completed task

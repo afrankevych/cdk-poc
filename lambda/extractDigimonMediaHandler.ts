@@ -1,8 +1,8 @@
 import {APIGatewayEvent, APIGatewayProxyResult} from "aws-lambda";
-import {extractPokemonMedia} from "@mediaExtractor/index";
+import {extractDigimonMedia} from "@mediaExtractor/index";
 import * as process from "process";
 
-export const extractPokemonMediaHandler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+export const extractDigimonMediaHandler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
 
     if (!event.queryStringParameters || !event.queryStringParameters.input) {
         return {
@@ -26,7 +26,7 @@ export const extractPokemonMediaHandler = async (event: APIGatewayEvent): Promis
     }
 
     try {
-        const media = await extractPokemonMedia({type: 'pokemon', name: event.queryStringParameters.input}, bucket);
+        const media = await extractDigimonMedia({type: 'digimon', name: event.queryStringParameters.input}, bucket);
         return {
             statusCode: 200,
             body: JSON.stringify({
@@ -34,6 +34,7 @@ export const extractPokemonMediaHandler = async (event: APIGatewayEvent): Promis
             })
         }
     } catch (err) {
+        console.error(err)
         return {
             statusCode: 500,
             body: JSON.stringify({
