@@ -1,12 +1,12 @@
-import * as cdk from 'aws-cdk-lib';
-import {RemovalPolicy} from 'aws-cdk-lib';
+import {RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as apigw from 'aws-cdk-lib/aws-apigateway';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
+import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 
-export class CdkPocStack extends cdk.Stack {
-    constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+export class CdkPocStack extends Stack {
+    constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
 
         const bucket = new s3.Bucket(this, 'AnimeCreaturesMediaStorage', {
@@ -34,14 +34,24 @@ export class CdkPocStack extends cdk.Stack {
             }
         });
 
-        new apigw.LambdaRestApi(this, 'extractPokemonMediaGateway', {
-            handler: extractPokemonMediaHandler
-        });
-        new apigw.LambdaRestApi(this, 'extractDigimonMediaGateway', {
-            handler: extractDigimonMediaHandler
-        });
-
         bucket.grantPut(extractPokemonMediaHandler);
         bucket.grantPut(extractDigimonMediaHandler);
+
+        const extractPokemonMediaTask = new tasks.LambdaInvoke(this, 'extractPokemonMediaTask', {
+            lambdaFunction: extractPokemonMediaHandler,
+        });
+        const extractDigimonMediaTask = new tasks.LambdaInvoke(this, 'extractDigimonMediaTask', {
+            lambdaFunction: extractDigimonMediaHandler,
+        });
+        const publishMediaExtractedEventTask = new sfn.Pass(this, 'publishMediaExtractedEventTask');
+
+        const choice = new sfn.Choice(this, 'CreatureTypeChoice')
+            .when(sfn.Condition.stringEquals('$.creatureType', 'pokemon'), extractPokemonMediaTask.next(publishMediaExtractedEventTask))
+            .when(sfn.Condition.stringEquals('$.creatureType', 'digimon'), extractDigimonMediaTask.next(publishMediaExtractedEventTask))
+            .otherwise(publishMediaExtractedEventTask)
+
+        new sfn.StateMachine(this, 'AnimeCreatureMediaExtractionStateMachine', {
+            definition: choice,
+        });
     }
 }
