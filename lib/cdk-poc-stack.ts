@@ -1,9 +1,10 @@
-import {RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
-import {Construct} from 'constructs';
+import * as events from 'aws-cdk-lib/aws-events';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
+import {Construct} from 'constructs';
+import {RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
 
 export class CdkPocStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -11,7 +12,6 @@ export class CdkPocStack extends Stack {
 
         const bucket = new s3.Bucket(this, 'AnimeCreaturesMediaStorage', {
             removalPolicy: RemovalPolicy.DESTROY,
-            publicReadAccess: true,
         });
 
         const extractPokemonMediaHandler = new lambda.Function(this, 'extractPokemonMediaHandler', {
@@ -20,7 +20,6 @@ export class CdkPocStack extends Stack {
             handler: 'index.extractPokemonMediaHandler',
             environment: {
                 S3_BUCKET: bucket.bucketName,
-                S3_BUCKET_DOMAIN: bucket.bucketDomainName,
             }
         });
 
@@ -30,7 +29,6 @@ export class CdkPocStack extends Stack {
             handler: 'index.extractDigimonMediaHandler',
             environment: {
                 S3_BUCKET: bucket.bucketName,
-                S3_BUCKET_DOMAIN: bucket.bucketDomainName,
             }
         });
 
@@ -46,8 +44,8 @@ export class CdkPocStack extends Stack {
         const publishMediaExtractedEventTask = new sfn.Pass(this, 'publishMediaExtractedEventTask');
 
         const choice = new sfn.Choice(this, 'CreatureTypeChoice')
-            .when(sfn.Condition.stringEquals('$.creatureType', 'pokemon'), extractPokemonMediaTask.next(publishMediaExtractedEventTask))
-            .when(sfn.Condition.stringEquals('$.creatureType', 'digimon'), extractDigimonMediaTask.next(publishMediaExtractedEventTask))
+            .when(sfn.Condition.stringEquals('$.data.type', 'pokemon'), extractPokemonMediaTask.next(publishMediaExtractedEventTask))
+            .when(sfn.Condition.stringEquals('$.data.type', 'digimon'), extractDigimonMediaTask.next(publishMediaExtractedEventTask))
             .otherwise(publishMediaExtractedEventTask)
 
         new sfn.StateMachine(this, 'AnimeCreatureMediaExtractionStateMachine', {

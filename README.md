@@ -60,8 +60,8 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
   - [x] Add S3 integration
 - [x] Add lambda handler for pokemon media extraction
 - [x] Add lambda handler for pokemon media extraction
-- [ ] Add step function
-  - [ ] Lambda choice step
-  - [ ] Media extraction completed task
+- [x] Add step function
+  - [x] Lambda choice step
+  - [x] Media extraction completed task
 - [ ] Add EventBridge Integration 
-- [ ] Add datadog integration (lambda construct extension or using _CDK Aspects_)
+- [ ] Add DataDog integration (via lambda construct extension or using _CDK Aspects_)

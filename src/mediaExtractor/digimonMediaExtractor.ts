@@ -22,6 +22,7 @@ export const extractDigimonMediaFactory = (httpClient: AxiosInstance, storageCli
     }
 
     return {
+        bucket,
         path: res.Key,
     }
 }

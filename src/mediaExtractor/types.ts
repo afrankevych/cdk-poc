@@ -10,6 +10,7 @@ type Digimon = Creature & {
 };
 
 type Media = {
+    bucket: string,
     path: string,
 };
 

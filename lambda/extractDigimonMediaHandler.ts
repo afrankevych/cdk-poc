@@ -1,54 +1,59 @@
-import {APIGatewayEvent, APIGatewayProxyResult} from "aws-lambda";
 import {extractDigimonMedia} from "@mediaExtractor/index";
 import * as process from "process";
-import * as console from "console";
 
 type InEvent = {
-    [key: string]: unknown
-} & {
     data: Digimon
+} & {
+    [key: string]: unknown
+};
+type OutEvent = {
+    data: {
+        media: Media[],
+    }
+} & {
+    [key: string]: unknown
 };
 
-type OutEvent = unknown;
-
 export const extractDigimonMediaHandler = async (event: InEvent): Promise<OutEvent> => {
-    // TODO log incoming event
-    // console.log("EVENT: ", JSON.stringify(event));
+    console.log("Event received: ", JSON.stringify(event));
 
-    // TODO log setup error
     const bucket = process.env.S3_BUCKET;
-    const bucketDomain = process.env.S3_BUCKET_DOMAIN;
-    if (!bucket || !bucketDomain) {
+    if (!bucket) {
+        console.error('Setup Error: missing S3_BUCKET env var')
         return {
-            statusCode: 500,
-            body: JSON.stringify({
-                title: 'Internal Server Error',
-                detail: 'The server was not properly configured',
-            })
-        }
+            data: {
+                media: [],
+            }
+        };
     }
 
-    // TODO log validation error
-    try {
-        const media = await extractDigimonMedia({type: 'digimon', name: event.data.name}, bucket);
+    if (!event.data.name || !event.data.type) {
+        console.error('Validation Error: Invalid payload')
+        return {
+            data: {
+                media: [],
+            }
+        };
+    }
 
-        // TODO log out-coming event
-        // TODO return proper event
+    try {
+        const media = await extractDigimonMedia(event.data, bucket);
+        console.log('Media extracted: ', JSON.stringify(media));
+
         return {
-            statusCode: 200,
-            body: JSON.stringify({
-                sprite: `https://${bucketDomain}/${media.path}`
-            })
+            data: {
+                media: [
+                    {...media},
+                ]
+            },
         }
-    } catch (err) {
-        // TODO log execution error
-        console.error(err)
+    } catch (error) {
+        console.error('Media extraction error: ', JSON.stringify(error));
+
         return {
-            statusCode: 500,
-            body: JSON.stringify({
-                title: 'Internal Server Error',
-                detail: (err as Error).message,
-            })
-        }
+            data: {
+                media: []
+            }
+        };
     }
 };

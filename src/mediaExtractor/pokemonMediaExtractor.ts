@@ -22,6 +22,7 @@ export const extractPokemonMediaFactory = (httpClient: AxiosInstance, storageCli
     }
 
     return {
+        bucket,
         path: res.Key,
     }
 }
