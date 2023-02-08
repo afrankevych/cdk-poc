@@ -1,5 +1,7 @@
 import * as events from 'aws-cdk-lib/aws-events';
+import * as eventsTarget from "aws-cdk-lib/aws-events-targets";
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
@@ -54,17 +56,42 @@ export class CdkPocStack extends Stack {
             entries: [{
                 detail: sfn.TaskInput.fromJsonPathAt('$.Payload'),
                 eventBus: eventBus,
-                detailType: 'MediaExtractedEvent',
-                source: 'AnimeCreatureMediaExtractionStateMachine',
+                detailType: 'MediaExtractionCompleted',
+                source: stateMachineId,
             }],
         });
-        const choice = new sfn.Choice(this, 'CreatureTypeChoice')
-            .when(sfn.Condition.stringEquals('$.data.type', 'pokemon'), extractPokemonMediaTask.next(publishMediaExtractedEventTask))
-            .when(sfn.Condition.stringEquals('$.data.type', 'digimon'), extractDigimonMediaTask.next(publishMediaExtractedEventTask))
+        const animeCreatureTypeChoice = new sfn.Choice(this, 'CreatureTypeChoice')
+            .when(sfn.Condition.stringEquals('$.detail.data.type', 'pokemon'), extractPokemonMediaTask.next(publishMediaExtractedEventTask))
+            .when(sfn.Condition.stringEquals('$.detail.data.type', 'digimon'), extractDigimonMediaTask.next(publishMediaExtractedEventTask))
             .otherwise(publishMediaExtractedEventTask)
 
-        new sfn.StateMachine(this, stateMachineId, {
-            definition: choice,
+        const animeCreatureMediaExtractionStateMachine = new sfn.StateMachine(this, stateMachineId, {
+            definition: animeCreatureTypeChoice,
         });
+
+        const animeCreatureMediaExtractedLogGroup = new logs.LogGroup(this, 'animeCreatureMediaExtractedLogGroup', {
+            retention: logs.RetentionDays.ONE_WEEK,
+            removalPolicy: RemovalPolicy.DESTROY
+        })
+
+        new events.Rule(this, "startAnimeCreatureMediaExtraction", {
+            eventBus: eventBus,
+            targets: [
+                new eventsTarget.SfnStateMachine(animeCreatureMediaExtractionStateMachine),
+            ],
+            eventPattern: {
+                detailType: ['MediaExtractionRequested'],
+            },
+        });
+
+        new events.Rule(this, 'MediaExtractionCompleted', {
+            eventBus: eventBus,
+            targets: [
+                new eventsTarget.CloudWatchLogGroup(animeCreatureMediaExtractedLogGroup)
+            ],
+            eventPattern: {
+                detailType: ['MediaExtractionCompleted']
+            }
+        })
     }
 }

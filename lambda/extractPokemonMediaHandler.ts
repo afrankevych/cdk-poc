@@ -1,5 +1,6 @@
 import {extractPokemonMedia} from "@mediaExtractor/index";
 import * as process from "process";
+import {EventBridgeEvent} from "aws-lambda";
 
 type InEvent = {
     data: Pokemon
@@ -14,7 +15,7 @@ type OutEvent = {
     [key: string]: unknown
 };
 
-export const extractPokemonMediaHandler = async (event: InEvent): Promise<OutEvent> => {
+export const extractPokemonMediaHandler = async (event: EventBridgeEvent<'MediaExtractionRequested', InEvent>): Promise<OutEvent> => {
     console.log("Event received: ", JSON.stringify(event));
 
     const bucket = process.env.S3_BUCKET;
@@ -27,7 +28,7 @@ export const extractPokemonMediaHandler = async (event: InEvent): Promise<OutEve
         };
     }
 
-    if (!event.data.name || !event.data.type) {
+    if (!event.detail.data.name || !event.detail.data.type) {
         console.error('Validation Error: Invalid payload')
         return {
             data: {
@@ -37,7 +38,7 @@ export const extractPokemonMediaHandler = async (event: InEvent): Promise<OutEve
     }
 
     try {
-        const media = await extractPokemonMedia(event.data, bucket);
+        const media = await extractPokemonMedia(event.detail.data, bucket);
         console.log('Media extracted: ', JSON.stringify(media));
 
         return {

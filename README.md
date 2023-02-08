@@ -63,7 +63,8 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 - [x] Add step function
   - [x] Lambda choice step
   - [x] Media extraction completed task
-- [ ] Add EventBridge Integration
+- [x] Add EventBridge Integration
+  - [x] Trigger state machine on event bus event
   - [x] Publish extracted media event to event bus
-  - [ ] Trigger state machine on event bus event
+  - [x] Log extracted media event to cloudwatch
 - [ ] Add DataDog integration (via lambda construct extension or using _CDK Aspects_)
