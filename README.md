@@ -67,4 +67,4 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
   - [x] Trigger state machine on event bus event
   - [x] Publish extracted media event to event bus
   - [x] Log extracted media event to cloudwatch
-- [ ] Add DataDog integration (via lambda construct extension or using _CDK Aspects_)
+- [ ] Add DataDog integration (via lambda construct extension ~~or using CDK Aspects~~ DataDog does not support CDK Aspects)
